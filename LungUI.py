@@ -1,10 +1,11 @@
-import os
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import LungProcessing as lungProcessor
+import FileAccessLayer as fileLayer
+from PIL import Image, ImageTk
 
 root = tk.Tk()
-root.title('CellSeeUs')
+root.title('ScanSlide')
 
 selectedFolder = tk.StringVar()
 outputFileName = tk.StringVar()
@@ -38,18 +39,21 @@ def outputFileName_changed(var1, var2, var3):
 def process_button_selected():
     outputFullFileName = outputFileName.get() + ".csv"
 
-    #Check if output file exists. Offer options to Overwrite, Append or Cancel
-    #TODO
+    if fileLayer.file_exists(outputFullFileName):
+        print("Error: File already exists, aborting")
+        messagebox.showerror("ScanSlide", "Output filename already exists")
+        return
 
     #Begin Processing
     processButton.active = False
     processButton.text = "Processing..."
-    lungProcessor.process_folder(selectedFolder.get(), outputFullFileName)
+    results = lungProcessor.process_folder(selectedFolder.get())
+    fileLayer.write_results_to_file(results, outputFullFileName)
     processButton.text = "Process Files"
     processButton.active = True
 
     #Show output
-    os.startfile(outputFullFileName)
+    fileLayer.open_file(outputFullFileName)
 
 
 outputFileName.trace_add("write", outputFileName_changed)
@@ -65,12 +69,17 @@ outputNameEntry = tk.Entry(contentFrame, textvariable=outputFileName, width=50)
 
 processButton = tk.Button(contentFrame, text="Process Files", state=tk.DISABLED, command=process_button_selected, width=10)
 
+#previewImage = tk.PhotoImage(Image.open("blankImage.jpg"))
+#previewImageCanvas = tk.Canvas(contentFrame, width=100, height=100)
+#previewImageCanvas.create_image(20, 20, image=previewImage)
+##previewImageCanvas.create_rectangle(0,0,10,10, fill="blue")
 
 selectFolderLabel.grid(row=0, column=0)
 selectFolderButton.grid(row=0, column=4, padx=5)
 outputNameLabel.grid(row=1, column=0, sticky="W")
 outputNameEntry.grid(row=2, column=0)
 processButton.grid(row=2, column=4, padx=5)
+#previewImageCanvas.grid(row=3, column=0)
 
 
 root.mainloop()
