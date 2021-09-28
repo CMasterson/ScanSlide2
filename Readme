@@ -1,1 +1,4 @@
-I'm sure I'll get around to this... eventually
+This tool takes all images in a given directory, enhances the contrast and then writes the percentage of light pixels in the image.
+It then outputs the results to a .csv file of a given name.
+
+This is designed to be used on lung tissue biopsy images to get the amount of air vs cell tissue.
